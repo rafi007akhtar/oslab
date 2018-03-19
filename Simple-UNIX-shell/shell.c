@@ -5,20 +5,24 @@
 
 #define MAX_LINE		80 /* 80 chars per line, per command */
 
-char *hints = "\nWelcome to Guest session. Non-paramter commands are suppported in this basic shell (eg., ls, ps, pwd, whoami, gedit, vi, and so on). \nNote that commands that require one or more parameters are unsupported for now (like cd, mkdir, and so on). \nTo view these instructions anytime, press 'hints'. \nTo exit anytime, press Ctrl + Z. \n";
+char *hints = "\nWelcome to Guest session. Non-paramter commands are suppported in this basic shell (eg., ls, ps, pwd, whoami, gedit, vi, and so on). \nNote that commands that require one or more parameters are unsupported for now (like cd, mkdir, and so on). \nTo view these instructions anytime, press 'hints'. \nTo exit anytime, press 'quit'. \n";
+
+int hCount = 0;
+char *history[10];
 
 void printArray(char **params, int l)
 {
 	int i;
-	for (i = 0; i < l; i++) printf("%s", params[i]);
+	for (i = 0; i < l; i++) printf("%s\n", params[i]);
 }
 
 int main(void)
 {
 	char *args[MAX_LINE/2 + 1];	/* command line (of 80) has max of 40 arguments */
 	char *params[39]; // parameters
+	
     int should_run = 1;
-	int i, j, upper;
+	int i, j;
 	
 	pid_t pid;
 	char temp[80];
@@ -32,7 +36,10 @@ int main(void)
         
         // take the string input, and split the arguments into words
         gets(temp);
+        history[hCount++] = temp;
         if (!strcmp(temp, "hints")) printf(hints);
+        if (!strcmp(temp, "quit")) should_run = 0;
+        if (!strcmp(temp, "history")) printf("%s", history[hCount-1]);
 
         words = strtok(temp, " ");
         i = j = 0;
