@@ -4,6 +4,7 @@ The programs are inspired from end-of-chapter projects in Silberchatz's _Operati
 
 ## List of projects fully implemented
 <li> Linux Kernel Modules (Chapter #2) <br>
+<li> Simple UNIX Shell (Chapter #3) <br>
 
 The chapter numbers are concurrent with Silberchatz's _Operating System Concepts_, 9th edition.
 
