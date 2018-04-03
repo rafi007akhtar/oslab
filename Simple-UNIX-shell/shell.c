@@ -11,19 +11,20 @@
 
 #define MAX_LINE		80 /* 80 chars per line, per command */
 
-char *hints = "\nWelcome to this session, user. Most terminal commands are supported in this shell. \n\nApart from them, this shell supports a few other commands. Enter 'extras' to know what they are. \nYou can see what user you are by entering 'whoami'. \n\nTo view these instructions anytime, press 'hints'. \n\nTo exit the current process and move to immediate parent process, enter 'quit' \nNOTE: Entering 'quit' in the parent process will end this shell process \n\nTo exit anytime, press Ctrl+C or Ctrl+Z. \n\nⓒ  Md Rafi Akhtar, 2018\n";
+// Instructions that users see while executing the shell
+char *hints = "\nWelcome to this session, user. Most terminal commands are supported in this shell. \n\nApart from them, this shell supports a few other commands. Enter 'extras' to know what they are. \nYou can see what user you are by entering 'whoami'. \n\nTo view these instructions anytime, press 'hints'. \n\nTo exit the current process and move to immediate parent process, enter 'quit'. \nNOTE: Entering 'quit' in the parent process will end this shell process. \n\nTo exit anytime, press Ctrl+C or Ctrl+Z. \n\nⓒ  Md Rafi Akhtar, 2018\n";
 
+// A bunch of extra things that this shell can provide to the user
 char *extras[] = {{"\n1. <command> & \n Apply '&' at the end of a shell command so that the parent process doesn't wait for the child to terminate and run concurrently with it. \n Eg: ps -ael & \n Warning: This normally results in segmentation fault, hence it is heavily ill-advised to use this command. \n"}, {"\n2. hints \n Shows startup hints on the console. \n"}, {"\n3. !! \n Run the most recent command. \n"}, {"\n4. !<someInt> \n Run the nth command in history \n Eg., !5 will run the 5th command in history (provided there is one). \n"}, {"\n5. history \n Show the most recent commands in history, with most recent at the bottom \n"}, {"\n6. quit \n Quits the shell when in user-mode. \n If you are in root mode, you first need to return back to user mode by entering 'exit', and then enter 'quit'. \n"}};
 const int extraItems = 6; // NOTE: Increment this number as you increase items in extras
 
 typedef enum boolean {false, true} bool;
 
 int histItems = 0; // keeps a track of the number of commands executed
-bool waitFlag = true; // will wait for the child process to end execution until user end with '&'
 
 void printArray(char **params, int l)
 {
-	/** Print elements of the string array params of length l */
+	/** Utility function to print elements of the string array, params, of length l */
 
 	int i;
 	for (i = 0; i < l; i++) printf("%s", params[i]);
@@ -77,7 +78,6 @@ int execute(char *command)
 	{
 		if (strcmp(words, "&"))
 			args[i] = words;
-		else { waitFlag = false; break; }
 		i++;
 		words = strtok(NULL, " ");
 	}
@@ -99,13 +99,10 @@ int execute(char *command)
 	// invoke execvp()
 	getVal = execvp(args[0], args);
 
-	if (getVal == -1)
-	{
-		printf("Sorry, that command is not supported in this shell. \nIf you believe your requested command works in regular UNIX shells, try getting into the root mode by entering:\n sudo -i \nIf the problem still persists, and you are sure there is a bug with this shell, email the author at: alimdrafi@gmail.com\n");
-		// TODO: Make sure to NOT add this in your history variable when you create it
-	}
+	//else return 0;
+	if (waitFlag == false) return 2;
 
-	else return 0;
+	return getVal; // success
 
 }
 
@@ -189,6 +186,7 @@ int main()
 
 	bool should_run = true;
 	int i, getVal, n;
+	int lastPos; // will be required for waiting / not-waiting child process to end
 
 	pid_t pid;
 	char temp[80];
@@ -230,13 +228,14 @@ int main()
 			else 
 				getVal = execute(temp);
 			if (getVal == 1) continue;
+			if (getVal == -1)
+				printf("Sorry, that command is not supported in this shell. \nIf you believe your requested command works in regular UNIX shells, try getting into the root mode by entering:\n sudo -i \nIf the problem still persists, and you are sure there is a bug with this shell, email the author at: alimdrafi@gmail.com\n");
 		}
 		else // parent
 		{
 			// Wait for child to finish execution unless user ends with '&' (reversing the original part of the problem)
-			if (waitFlag == true)
-				wait (NULL);
-			else waitFlag = true;
+			lastPos = strlen(temp) - 1;
+			if (temp[lastPos] != '&') wait(NULL);
 		}
 	}
 
