@@ -11,6 +11,8 @@
 
 #define MAX_LINE		80 /* 80 chars per line, per command */
 
+// DEFINE GLOBAL VARIABLES
+
 // Instructions that users see while executing the shell
 char *hints = "\nWelcome to this session, user. Most terminal commands are supported in this shell. \n\nApart from them, this shell supports a few other commands. Enter 'extras' to know what they are. \nYou can see what user you are by entering 'whoami'. \n\nTo view these instructions anytime, press 'hints'. \n\nTo exit the current process and move to immediate parent process, enter 'quit'. \nNOTE: Entering 'quit' in the parent process will end this shell process. \n\nTo exit anytime, press Ctrl+C or Ctrl+Z. \n\nⓒ  Md Rafi Akhtar, 2018\n";
 
@@ -21,6 +23,83 @@ const int extraItems = 6; // NOTE: Increment this number as you increase items i
 typedef enum boolean {false, true} bool;
 
 int histItems = 0; // keeps a track of the number of commands executed
+
+
+// FUNCTION PROTOTYPES
+void printArray(char**, int);
+void updateHistory(char*);
+void printHistory();
+int execute(char*);
+void runMostRecent();
+int getNth(char*);
+void runNth(char*);
+
+
+// DRIVER FUNCTION
+int main()
+{
+	FILE *f; // this file will save history
+
+	bool should_run = true;
+	int i, getVal, n;
+	int lastPos; // will be required for waiting / not-waiting child process to end
+
+	pid_t pid;
+	char temp[80];
+	char *number = "";
+
+	printf("%s", hints); // Print the opening hints
+
+	// open and close the history file to clear it
+	f = fopen("history.txt", "w+");
+	fclose(f);
+
+	while (should_run)
+	{
+		printf("\nuser> ");
+		fflush(stdout);
+
+		// take the string input, and update history (if it's not invoking a previous command through '!')
+		gets(temp);
+
+		if (!strcmp(temp, "quit"))  { should_run = false; exit(0); }
+		if (temp[0] != '!') { updateHistory(temp); histItems++; }
+		
+		// fork a child process
+		pid = fork();
+
+		if (pid < 0) // error
+		{
+			fprintf(stderr, "System error\n");
+			return 1;
+		}
+		else if (pid == 0) // child process
+		{
+			if (!strcmp(temp, "!!")) { runMostRecent(); continue; }
+			else if (temp[0] == '!' && isdigit(temp[1])) 
+			{ 
+				runNth(temp);
+				continue; 
+			}
+			else 
+				getVal = execute(temp);
+				
+			if (getVal == 1) continue;
+			if (getVal == -1)
+				printf("Sorry, that command is not supported in this shell. \nIf you believe your requested command works in regular UNIX shells, try getting into the root mode by entering:\n sudo -i \nIf the problem still persists, and you are sure there is a bug with this shell, email the author at: alimdrafi@gmail.com\n");
+		}
+		else // parent
+		{
+			// Wait for child to finish execution unless user ends with '&' (reversing the original part of the problem)
+			lastPos = strlen(temp) - 1;
+			if (temp[lastPos] != '&') wait(NULL);
+		}
+	}
+
+	return 0;
+}
+
+// PROTOTYPE DEFINITIONS
 
 void printArray(char **params, int l)
 {
@@ -136,7 +215,9 @@ void runMostRecent()
 
 int getNth(char *num)
 {
-	/** Fetch nth command in the history by invoking !n from the user, where n is the command number */
+	/** Fetch nth command in the history by invoking !n from the user, where n is the command number
+	  * Return n
+	*/
 
 	int l = strlen(num);
 	int i, j = 0, n;
@@ -182,67 +263,4 @@ void runNth(char *num)
 	count = strlen(nthCommand) - 1; // to eliminate the '\n' just before the '\0'
 	strncpy(trimmedCommand, nthCommand, count);
 	getVal = execute(trimmedCommand);
-}
-
-
-int main()
-{
-	FILE *f; // this file will save history
-
-	bool should_run = true;
-	int i, getVal, n;
-	int lastPos; // will be required for waiting / not-waiting child process to end
-
-	pid_t pid;
-	char temp[80];
-	char *number = "";
-
-	printf("%s", hints);
-
-	// open and close the history file to clear it
-	f = fopen("history.txt", "w+");
-	fclose(f);
-
-	while (should_run)
-	{
-		printf("\nuser> ");
-		fflush(stdout);
-
-		// take the string input, and update history (if it's not invoking a previous command through '!')
-		gets(temp);
-
-		if (!strcmp(temp, "quit"))  { should_run = false; exit(0); }
-		if (temp[0] != '!') { updateHistory(temp); histItems++; }
-		
-		// fork a child process
-		pid = fork();
-
-		if (pid < 0) // error
-		{
-			fprintf(stderr, "System error\n");
-			return 1;
-		}
-		else if (pid == 0) // child process
-		{
-			if (!strcmp(temp, "!!")) { runMostRecent(); continue; }
-			else if (temp[0] == '!' && isdigit(temp[1])) 
-			{ 
-				runNth(temp);
-				continue; 
-			}
-			else 
-				getVal = execute(temp);
-			if (getVal == 1) continue;
-			if (getVal == -1)
-				printf("Sorry, that command is not supported in this shell. \nIf you believe your requested command works in regular UNIX shells, try getting into the root mode by entering:\n sudo -i \nIf the problem still persists, and you are sure there is a bug with this shell, email the author at: alimdrafi@gmail.com\n");
-		}
-		else // parent
-		{
-			// Wait for child to finish execution unless user ends with '&' (reversing the original part of the problem)
-			lastPos = strlen(temp) - 1;
-			if (temp[lastPos] != '&') wait(NULL);
-		}
-	}
-
-	return 0;
 }
