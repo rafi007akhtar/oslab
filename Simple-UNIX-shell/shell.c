@@ -34,6 +34,11 @@ void updateHistory(char *temp)
 {
 	/** Add commands to the history file as user enters them */
 
+	// DO NOT add to history if there is no command to add
+	if (!strcmp(temp, "") || !strcmp(temp, " ") || !strcmp(temp, "\n")) return;
+
+	// In all other cases, add to history
+	// TODO: Refine these commands later so as not to include invalid commands
 	FILE *f = fopen("history.txt", "a+");
 	fprintf(f, "%s\n", temp);
 	fclose(f);
