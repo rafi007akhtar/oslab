@@ -70,7 +70,7 @@ int main()
 		gets(temp);
 
 		if (!strcmp(temp, "up"))  { should_run = false; exit(0); }
-		if (temp[0] != '!') { updateHistory(temp); histItems++; }
+		if (temp[0] != '!') { updateHistory(temp); }
 		
 		// fork a child process
 		pid = fork();
@@ -123,11 +123,12 @@ void updateHistory(char *temp)
 	// DO NOT add to history if there is no command to add
 	if (!strcmp(temp, "") || !strcmp(temp, " ") || !strcmp(temp, "\n")) return;
 
-	// In all other cases, add to history
+	// In all other cases, add to history, and update number of items in history
 	// TODO: Refine these commands later so as not to include invalid commands
 	FILE *f = fopen("history.txt", "a+");
 	fprintf(f, "%s\n", temp);
 	fclose(f);
+	histItems++;
 }
 
 void printHistory()
