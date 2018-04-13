@@ -17,4 +17,4 @@ The Debian virtual OS I used was the official virtual OS provided as a student r
 <li> All the starter code for each project was readily available in the virtual OS. I only had to add upon them as per the instructions given in the book. I did not create the programs from scratch.
 <li> I have not copied the code from elsewhere, nor do I claim the code to be error free or the official solutions. 
 Please <em>do not</em> copy-paste my code as homework solutions.
-<li> In case of any error, feel free to email me: alimdrafi@gmail.com
+<li> In case of any error, feel free to email me: <a href="mailto:alimdrafi@gmail.com" target="_blank"> alimdrafi@gmail.com </a>
