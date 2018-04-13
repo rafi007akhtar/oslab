@@ -1,4 +1,4 @@
-/** Emulate a basic Linux terminal, and some features of your own */
+/** Emulate a basic Linux terminal, and some add features of your own */
 
 #include <stdio.h>
 #include <unistd.h> // includes fork(), execvp()
@@ -14,10 +14,17 @@
 // DEFINE GLOBAL VARIABLES
 
 // Instructions that users see while executing the shell
-char *hints = "\nWelcome to this session, user. Most terminal commands are supported in this shell. \n\nApart from them, this shell supports a few other commands. Enter 'extras' to know what they are. \nYou can see what user you are by entering 'whoami'. \n\nTo view these instructions anytime, press 'hints'. \n\nTo exit the current process and move to immediate parent process, enter 'quit'. \nNOTE: Entering 'quit' in the parent process will end this shell process. \n\nTo exit anytime, press Ctrl+C or Ctrl+Z. \n\nⓒ  Md Rafi Akhtar, 2018\n";
+const char *hints = "\nWelcome to this session, user. Most terminal commands are supported in this shell. \n\nApart from them, this shell supports a few other commands. Enter 'extras' to know what they are. \nYou can see what user you are by entering 'whoami'. \n\nTo view these instructions anytime, press 'hints'. \n\nTo exit the current process and move to immediate parent process, enter 'up'. \nNOTE: Entering 'up' in the parent process will end this shell. \n\nTo exit anytime, press Ctrl+C or Ctrl+Z. \n\nⓒ  Md Rafi Akhtar, 2018\n";
 
 // A bunch of extra things that this shell can provide to the user
-char *extras[] = {{"\n1. <command> & \n Apply '&' at the end of a shell command so that the parent process doesn't wait for the child to terminate and run concurrently with it. \n Eg: ps -ael & \n Warning: This normally results in segmentation fault, hence it is heavily ill-advised to use this command. \n"}, {"\n2. hints \n Shows startup hints on the console. \n"}, {"\n3. !! \n Run the most recent command. \n"}, {"\n4. !<someInt> \n Run the nth command in history \n Eg., !5 will run the 5th command in history (provided there is one). \n"}, {"\n5. history \n Show the most recent commands in history, with most recent at the bottom \n"}, {"\n6. quit \n Quits the shell when in user-mode. \n If you are in root mode, you first need to return back to user mode by entering 'exit', and then enter 'quit'. \n"}};
+const char *extras[] = {
+	{"\n1. <command> & \n Apply '&' at the end of a shell command so that the parent process doesn't wait for the child to terminate and run concurrently with it. \n Eg: ps -ael & \n Warning: This normally results in segmentation fault, hence it is heavily ill-advised to use this command. \n"},
+	{"\n2. hints \n Shows startup hints on the console. \n"}, 
+	{"\n3. !! \n Run the most recent command. \n"}, 
+	{"\n4. !<someInt> \n Run the nth command in history \n Eg., !5 will run the 5th command in history (provided there is one). \n"}, 
+	{"\n5. history \n Show the most recent commands in history, with most recent at the bottom \n"}, 
+	{"\n6. up \n Ends the current process when in user-mode. \n If you are in root mode, you first need to return back to user mode by entering 'exit', and then enter 'up'. \n"}
+};
 const int extraItems = 6; // NOTE: Increment this number as you increase items in extras
 
 typedef enum boolean {false, true} bool;
@@ -62,7 +69,7 @@ int main()
 		// take the string input, and update history (if it's not invoking a previous command through '!')
 		gets(temp);
 
-		if (!strcmp(temp, "quit"))  { should_run = false; exit(0); }
+		if (!strcmp(temp, "up"))  { should_run = false; exit(0); }
 		if (temp[0] != '!') { updateHistory(temp); histItems++; }
 		
 		// fork a child process
@@ -176,7 +183,13 @@ int execute(char *command)
 		return 1;
 	}
 
-	if (!strcmp(command, "hints"))	{ printf("%s", hints); return 1; }
+	if (!strcmp(command, "hints"))	
+	{ 
+		printf("%s", hints); 
+		fflush(stdin);
+		fflush(stdout);
+		return 1; 
+	}
 	if (!strcmp(command, "extras")) { printArray(extras, extraItems); return 1; }
 	if (!strcmp(command, "history")) { printHistory(); return 1; }
 	
@@ -237,6 +250,7 @@ void runNth(char *num)
 	/** Execute nth command in the history by invoking !n from the user, where n is the command number */
 
 	int n = getNth(num); // isolate the command number from !commandnumber
+	// printf("%d th command: ", n);
 
 	// Check for invalid input number
 	if (n > histItems || n < 1)
@@ -247,9 +261,14 @@ void runNth(char *num)
 
 	char *nthCommand = "";
 	char *line = NULL;
-    size_t len = 0, count = 0;
+    size_t len = 0;
+	int count = 0;
 	int i = 0, getVal;
 	char trimmedCommand[80]; // containts the command devoid of '\n' at the end
+	
+	// Perform some cleanup before fetching the history
+	fflush(stdin);
+	fflush(stdout);
 	
 	// Open history and fetch the nth command. This will contain a '\n' at the end
 	FILE *f = fopen("history.txt", "a+");
@@ -259,8 +278,12 @@ void runNth(char *num)
 		nthCommand = line;
 	}
 	fclose(f);
+	// printf("%s", nthCommand);
 
 	count = strlen(nthCommand) - 1; // to eliminate the '\n' just before the '\0'
+	// printf("Length needed: %d\n", count);
 	strncpy(trimmedCommand, nthCommand, count);
+	// printf("Executing command: %s \n", trimmedCommand);
+
 	getVal = execute(trimmedCommand);
 }
