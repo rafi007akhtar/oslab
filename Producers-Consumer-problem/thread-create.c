@@ -25,7 +25,7 @@ int main()
      * function to be called on thread creation (return type of it should be a void pointer);
      * argument passed to the above function (NULL if none)
      */
-    val = pthread_create(&tid, &attr, my_threadF, NULL);
+    val = pthread_create(&tid, &attr, my_threadF, &tid);
     pthread_join(tid, NULL);
 
     return 0;
@@ -33,6 +33,9 @@ int main()
 
 void *my_threadF(void *arg)
 {
+    pthread_t *t = (pthread_t *) arg;
+    pthread_t tid = *t;
+    printf("Thread id: %lu \n", tid);
     /** This function will be called when the pthread is created */
     printf("This is my thread.\n");
 
