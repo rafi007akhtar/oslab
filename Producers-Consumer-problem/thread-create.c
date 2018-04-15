@@ -33,10 +33,13 @@ int main()
 
 void *my_threadF(void *arg)
 {
+    /** Print the current thread id */
+
     pthread_t *t = (pthread_t *) arg;
     pthread_t tid = *t;
+    
     printf("Thread id: %lu \n", tid);
-    /** This function will be called when the pthread is created */
+    
     printf("This is my thread.\n");
 
     // Now exit this thread with status NULL
