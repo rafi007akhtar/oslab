@@ -21,13 +21,13 @@ int main()
 
     /* Parameters required for creating a pthread, in order:
      * address of unique thread id;
-     * address of attributes of this thread (NULL if none);
+     * address of attributes of this thread (NULL if default attribute wanted);
      * function to be called on thread creation (return type of it should be a void pointer);
      * argument passed to the above function (NULL if none)
      */
     val = pthread_create(&tid, &attr, my_threadF, NULL);
     pthread_join(tid, NULL);
-    
+
     return 0;
 }
 
