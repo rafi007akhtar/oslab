@@ -3,10 +3,13 @@ Operating System-based projects explored and implemented chapter-wise.
 The programs are inspired from end-of-chapter projects in Silberchatz's _Operating System Concepts_.
 
 ## List of projects fully implemented
+
+### Projects concurrent with chapters from Silberchatz's _Operating System Concepts_, 9th edition.
 <li> Linux Kernel Modules (Chapter #2) <br>
 <li> Simple UNIX Shell (Chapter #3) <br>
-
-The chapter numbers are concurrent with Silberchatz's _Operating System Concepts_, 9th edition.
+  
+### Projects indepentdent of chapters from any book
+  <li> Producer-Consumer problem
 
 ## Testing environment
 All programs were created and executed on a **Linux Debian** virtual OS running atop my Windows 8.1 native OS via VMware Workstation.
