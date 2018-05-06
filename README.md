@@ -9,7 +9,8 @@ The programs are inspired from end-of-chapter projects in Silberchatz's _Operati
 <li> Simple UNIX Shell (Chapter #3) <br>
   
 ### Projects indepentdent of chapters from any book
-  <li> Producer-Consumer problem
+<li> Producer-Consumer problem
+<li> PING-PONG problem
 
 ## Testing environment
 All programs were created and executed on a **Linux Debian** virtual OS running atop my Windows 8.1 native OS via VMware Workstation.
