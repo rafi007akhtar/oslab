@@ -7,6 +7,7 @@ The programs are inspired from end-of-chapter projects in Silberchatz's _Operati
 ### Projects concurrent with chapters from Silberchatz's _Operating System Concepts_, 9th edition.
 <li> Linux Kernel Modules (Chapter #2) <br>
 <li> Simple UNIX Shell (Chapter #3) <br>
+<li> Sudoku Solution Validator (Chapter #4) <br>
   
 ### Projects indepentdent of chapters from any book
 <li> Producer-Consumer problem
