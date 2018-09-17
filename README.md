@@ -20,14 +20,14 @@ The programs are inspired from end-of-chapter projects in Silberchatz's _Operati
 
 ## Running a multhreaded program
 
-## Prerequisites
+### Prerequisites
 <ol>
 	<li> These programs are tested in Linux Ubuntu, Fedora and Debain. They do not run in Windows; you will need a Linux OS to run them. </li>
 	<li> You will need a Terminal to execute commands. </li>
 	<li> You will require a C-compiler, preferebly gcc. </li>
 </ol>
 
-## Procedure
+### Procedure
 At first, open a Terminal and `cd` your way through the directory whose program you want to run. Then, run the commands required to execute a multithreaded program.
 
 For example, in order to run `shell.c` inside of Simple-UNIX-shell directory,
