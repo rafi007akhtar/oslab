@@ -35,4 +35,4 @@ In a way, this project implements the **merge-sort** algorithm with threads to s
 
 This project in the book allowed us to pick a sorting algorithm of our own to sort the subarrays; I chose merge-sort due to its low runtime complexity (`O(n lg n)`).
 
-Once again, this solution is not an official one, and the readers are requested to use it only for help, and for solving homework.
+Once again, this solution is not an official one, and the readers are requested to use it only for help, and _not_ for solving homework.
